@@ -1,0 +1,171 @@
+%Gottschalk, Rachel ECE 302: Assignment #6
+close all;
+clear all;
+clc;
+
+
+%%%%%%%% Part 1 %%%%%%%%%%
+n=1; 
+[k1,y1]=pmf(n); % send to pmf function
+[s1,f1]=pdf(n); % send to pdf function
+
+
+n=3;
+[k2,y2]=pmf(n);  % send to pmf function
+[s2,f2]=pdf(n); % send to pdf function
+
+n=10;
+[k3,y3]=pmf(n);  % send to pmf function
+[s3,f3]=pdf(n); % send to pdf function
+
+n=30;
+[k4,y4]=pmf(n); % send to pmf function
+[s4,f4]=pdf(n); % send to pdf function
+
+n=40;
+[k5,y5]=pmf(n); % send to pmf function
+[s5,f5]=pdf(n); % send to pdf function
+
+n=50;
+[k6,y6]=pmf(n); % send to pmf function
+[s6,f6]=pdf(n); % send to pdf function
+
+
+% plot all PMF and PDF for different n values
+figure(1)
+subplot(3,3,1)
+stem(k1,y1, "Linewidth", 1.3)
+hold on;
+plot(s1,f1, "Linewidth", 1.3)
+legend('PMF', 'PDF')
+grid on;
+xlabel('k value')
+ylabel('Sn')
+title('N=1')
+
+subplot(3,3,2)
+stem(k2,y2, "Linewidth", 1.3)
+hold on;
+plot(s2,f2, "Linewidth", 1.3)
+legend('PMF', 'PDF')
+grid on;
+xlabel('k value')
+ylabel('Sn')
+title('N=3')
+
+subplot(3,3,3)
+stem(k3,y3, "Linewidth", 1.3)
+hold on;
+plot(s3,f3, "Linewidth", 1.3)
+legend('PMF', 'PDF')
+grid on;
+xlabel('k value')
+ylabel('Sn')
+title('N=10')
+
+subplot(3,3,4)
+stem(k4,y4, "Linewidth", 1.3)
+hold on;
+plot(s4,f4, "Linewidth", 1.3)
+legend('PMF', 'PDF')
+grid on;
+xlabel('k value')
+ylabel('Sn')
+title('N=30')
+
+subplot(3,3,5)
+stem(k5,y5, "Linewidth", 1.3)
+hold on;
+plot(s5,f5, "Linewidth", 1.3)
+legend('PMF', 'PDF')
+grid on;
+xlabel('k value')
+ylabel('Sn')
+title('N=40')
+
+subplot(3,3,6)
+stem(k6,y6, "Linewidth", 1.3)
+hold on;
+plot(s6,f6, "Linewidth", 1.3)
+legend('PMF', 'PDF')
+grid on;
+xlabel('k value')
+ylabel('Sn')
+title('N=50')
+
+
+
+%%%%%%%% Part 2 %%%%%%%%%%
+n = 100;
+var = 1; % variance
+r = 330; % resistance
+i = 1:1:n; 
+X = zeros(1,length(i));
+
+for j = 1:length(i) % calculating X values 
+    X(j) = r + normrnd(0,var);
+end
+
+% smean = zeros(1,length()
+% for i = 1:length(X)
+%     smean(i) = sum(X(1:i));
+% end
+
+smean = (1/n)*sum(X); % calculate sample mean
+
+% calculating upper and lower bounds
+lbound = smean - ((1.96*sqrt(var))/(sqrt(n)));
+ubound = smean + ((1.96*sqrt(var))/(sqrt(n)));
+
+% plot the X values, resistance, sample mean, and convidence interval
+figure(2)
+scatter(i,X, "black")
+hold on;
+yline(r,'r','LineWidth',1.2)
+hold on;
+yline(smean, "b", "LineWidth",1.2)
+hold on;
+yline(lbound, "LineWidth",1)
+hold on;
+yline(ubound,"LineWidth",1)
+grid on;
+xlabel('i value')
+title("Estimating Resistance from Nosiy Measurement")
+legend('Sample Resistance','True Resitance', "Sample Mean", "Convidence Interval")
+
+
+
+%%%%%%%%%%%%%%%%%%% Functions %%%%%%%%%%%%%%%%%%%%%%
+function [k,y] = pmf(n) %PMF Calulation 
+    p = 0.5;
+    k = 0:1:n;
+    y = zeros(1,length(k));
+    b = zeros(1,length(k)+1);
+
+    for i = 1:n
+        b(i) = nchoosek(n, k(i));
+        y(i) = b(i)*(p^k(i))*((1-p)^(n-k(i)));
+    end
+
+end
+
+
+function [s,f] = pdf(n) %PDF Calculation
+    p = 0.5;
+    s = 0:n/100:n;
+
+    f = normpdf(s,n*p,sqrt(n*(p*(1-p))));
+
+end
+
+
+
+
+
+
+
+
+
+
+
+

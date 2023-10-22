@@ -1,0 +1,131 @@
+% ECE 302 - Gottschalk - Assignment #7 - Quiz Replacement 
+
+clc; clear all; close all;
+
+%%%%%%%%%%%%%%% initializations%%%%%%%%%%%%%%%%%%%%%%%%%%
+m = 1; % mass in kg
+tf = 60; % final time in seconds
+uk = 0.1; % applied real-valued force
+T = 0.5; % fixed time interval in seconds
+k = 0:1:1000; % time constant 
+
+x0 = 2; % true postion at t=0
+x0e = 3; % estimated position at t=0
+v0 = 4; % true velcocity at ms^-1
+v0e = 6; % estimated velcoity
+
+q0 = [x0 v0]; % true vector
+q0e = [x0e v0e]'; % estimated vector
+
+P0e = diag([(x0-x0e)^2,(v0-v0e)^2]); % error covariance matrix
+
+R = 0.5^2; % variance simg^2
+
+%%%%%%%%%%%%%%%%%% Calculations %%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%% for time
+t = zeros(1,121);
+for i = 1:length(k)
+    t(i) = k(i)*T; 
+    if t(i) >= 60
+        break
+    end
+end
+
+
+%% desired and estimated states
+Fk = [1 T; 0 1];
+Gk = [0 T/m]';
+Hk = [0 1]; 
+
+x = zeros(1,length(k));
+v = zeros(1,length(k));
+
+Q = 10^(-2)*[0.2 0.01; 0.01 0.1];
+
+% to length of k
+for i = 1:length(k)
+
+    %%% moves vehicle using dicrete-time model
+    if i == 1
+        x(i+1) = x0 + T*v0; 
+        v(i+1) = v0 + T*(uk/m);
+    else
+        x(i+1) = x(i) + T*v(i);
+        v(i+1) = v(i) + T*(uk/m);
+    end
+   
+
+end
+
+q_true = [x(1:end);v(1:end)]'; % true trajectory 
+
+for i = 1:length(k)
+    %%% estimated vehicle
+    [U,D,V]=svd(Q);
+    noise = V*(D^(0.5))*(randn(2,1));
+    
+    % predicted state ---- what is qn+ hat??
+    if i==1 
+        f = (Fk*q0e + Gk*uk + noise)';
+        q_predicted(1,i+1) = f(1);
+        q_predicted(2,i+1) = f(2);
+
+
+    else
+        q1 = q_true(i,1);
+        q2 = q_true(i,2);
+        q = [q1,q2]';
+
+        f = (Fk*q + Gk*uk + noise)';
+        q_predicted(1,i+1) = f(1);
+        q_predicted(2,i+1) = f(2);
+    end
+    
+end
+
+    
+
+q_predicted = q_predicted';
+
+figure(1)
+plot(q_predicted(6:end,1), q_predicted(6:end,2),"LineWidth",1.2)
+grid on; hold on;
+plot(q_true(6:end,1),q_true(6:end,2),"LineWidth", 1.2)
+hold on;
+legend("Estimated", "Desired")
+xlabel("Position")
+ylabel("Velocity")
+
+
+% error cov matrix
+for i = 1:length(k)
+    if i==1
+        e = Fk*P0e*(Fk')+Q;
+    else 
+        Pk = diag([(q_true(i,1)-q_predicted(i,1))^2,(q_true(i,2)-q_predicted(i,2))^2])
+        e = Fk*P0e*(Fk')+Q;
+    end
+    figure(2)
+    plot()
+
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
